@@ -7,6 +7,8 @@ collected in the constants below so they can be adapted in one place.
 import networkx as nx
 import plotly.graph_objects as go
 import streamlit as st
+from app import layout
+
 
 # ---- Names of the fields this view reads (adapt here when real structures land) ----
 ID, NAME, TYPE, REGION, ASSETS = "id", "name", "type", "region", "assets"
@@ -134,7 +136,7 @@ def render(entities, exposures, result):
             st.caption("No spread: nothing was affected beyond the source.")
 
     fig, stress = build_figure(entities, exposures, result, view_round)
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, **layout.stretch(st.plotly_chart))
 
     if result:
         labels = [status_from_stress(v) for v in stress.values()]

@@ -6,12 +6,17 @@ import inspect
 
 import streamlit as st
 
-# Full-width widgets: newer Streamlit uses width="stretch", older uses use_container_width.
-# Use as: st.button("Run", **STRETCH)
-if "width" in inspect.signature(st.button).parameters:
-    STRETCH = {"width": "stretch"}
-else:
-    STRETCH = {"use_container_width": True}
+
+def stretch(widget):
+    """Full-width kwargs for a Streamlit widget, whichever API this version supports.
+
+    Newer Streamlit uses width="stretch"; older uses use_container_width=True.
+    Use as: st.dataframe(df, **layout.stretch(st.dataframe))
+    """
+    if "width" in inspect.signature(widget).parameters:
+        return {"width": "stretch"}
+    return {"use_container_width": True}
+
 
 # Theme-aware (semi-transparent) so it works in both light and dark mode.
 _CSS = """
@@ -52,8 +57,8 @@ def render_sidebar(source_ids, names, on_run, on_reset):
         st.selectbox("Source institution", source_ids,
                      format_func=lambda i: names[i], key="selected_source")
         st.slider("Shock severity (%)", 0, 100, key="severity")
-        st.button("▶ Run", type="primary", on_click=on_run, **STRETCH)
-        st.button("Reset", on_click=on_reset, **STRETCH)
+        st.button("▶ Run", type="primary", on_click=on_run, **stretch(st.button))
+        st.button("Reset", on_click=on_reset, **stretch(st.button))
 
 
 def render_header():

@@ -5,6 +5,8 @@ Field names follow the CURRENT mock structures and live in the constants below.
 """
 import pandas as pd
 import streamlit as st
+from app import layout
+
 
 # ---- Names of the fields this view reads (adapt here when real structures land) ----
 ID, NAME, TYPE = "id", "name", "type"
@@ -57,5 +59,5 @@ def render(entities, baseline, result):
                    f"**{worst['Institution'].lstrip('★ ')}** ({worst['Scenario']:.1f}). "
                    "Click a column header to sort.")
 
-    st.dataframe(table, hide_index=True, column_config=config,
-                 use_container_width=True, height=min(35 * (len(table) + 1) + 3, 900))
+        st.dataframe(table, hide_index=True, column_config=config,
+                 height=min(35 * (len(table) + 1) + 3, 900), **layout.stretch(st.dataframe))
