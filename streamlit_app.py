@@ -10,6 +10,8 @@ import streamlit as st
 # TEMPORARY: mock data. Replace these imports/functions when the real engine
 # structures are known. Nothing below this section touches mock_data directly.
 from app import mock_data
+from app import network_view
+
 
 
 @st.cache_data
@@ -117,7 +119,7 @@ tab_network, tab_ranking, tab_explain, tab_about = st.tabs(
     ["Network", "Ranking", "Explain", "About / Method"]
 )
 with tab_network:
-    st.write("Network graph goes here.")
+     network_view.render(entities, exposures, st.session_state["result"])
 with tab_ranking:
     st.write("Baseline vs scenario ranking goes here.")
 with tab_explain:
