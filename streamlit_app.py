@@ -1,18 +1,19 @@
 """FIN-DOM dashboard entry point (Person B).
 
-Step 3: Run button wired to the mock cascade; KPI cards show real (mock) numbers.
+Wires together data access, session state, and the layout and tab views.
 All data access goes through the DATA ACCESS section below, so swapping the mock
 for Person A's engine later means editing only that section.
 """
 import streamlit as st
 
+from app import about_view, explain_view, layout, network_view, ranking_view
+
+layout.configure_page()  # must come before any other Streamlit output
+
 # ======================= DATA ACCESS (swap point) =======================
 # TEMPORARY: mock data. Replace these imports/functions when the real engine
 # structures are known. Nothing below this section touches mock_data directly.
 from app import mock_data
-from app import about_view ,network_view, ranking_view, explain_view
-
-
 
 
 @st.cache_data
@@ -31,6 +32,7 @@ def run_scenario(source_id, severity_pct):
     entities, exposures = get_data()
     return mock_data.mock_cascade(entities, exposures, source_id, severity_pct)
 
+
 def explain_entity(result, entity_id):
     """Return the explanation dict for one institution."""
     entities, _ = get_data()
@@ -46,15 +48,7 @@ def compute_kpis(result):
         "loss": result["total_loss"],
         "rounds": result["rounds"],
     }
-
 # ========================================================================
-
-st.set_page_config(
-    page_title="FIN-DOM | Financial Domino Effect",
-    page_icon="🕸️",
-    layout="wide",
-    initial_sidebar_state="expanded",
-)
 
 entities, exposures = get_data()
 names = entities.set_index("id")["name"].to_dict()
@@ -83,53 +77,23 @@ def on_run():
     )
 
 
-# ---- Sidebar ----
-with st.sidebar:
-    st.title("🕸️ FIN-DOM")
-    st.caption("Financial Domino Effect simulator (synthetic data)")
-    st.divider()
-    st.selectbox(
-        "Source institution", source_ids,
-        format_func=lambda i: names[i], key="selected_source",
-    )
-    st.slider("Shock severity (%)", 0, 100, key="severity")
-    st.button("▶ Run", type="primary", on_click=on_run, use_container_width=True)
-    st.button("Reset", on_click=reset_scenario, use_container_width=True)
-
-# ---- Header and KPI cards ----
-st.title("Financial Domino Effect")
-st.caption("Pick a source institution, set a severity, and click Run.")
+# ---- Page ----
+layout.render_sidebar(source_ids, names, on_run, reset_scenario)
+layout.render_header()
 
 result = st.session_state["result"]
-if result is None:
-    values = {"hit": "—", "failed": "—", "loss": "—", "rounds": "—"}
-else:
-    k = compute_kpis(result)
-    values = {"hit": k["hit"], "failed": k["failed"],
-              "loss": f"{k['loss']:,.0f}M", "rounds": k["rounds"]}
+layout.render_kpis(compute_kpis(result) if result else None)
+layout.render_status(names[result["source_id"]] if result else None,
+                     result["severity"] if result else None)
 
-cards = [("Entities hit", values["hit"]), ("Failed entities", values["failed"]),
-         ("Total loss", values["loss"]), ("Rounds", values["rounds"])]
-for col, (label, value) in zip(st.columns(4), cards):
-    col.metric(label, value)
-
-if result is None:
-    st.info("No scenario run yet.")
-else:
-    st.success(
-        f"Scenario: **{names[result['source_id']]}** shocked at "
-        f"**{result['severity']}%** severity. (Mock data, illustrative only.)"
-    )
-
-# ---- Tabs ----
 tab_network, tab_ranking, tab_explain, tab_about = st.tabs(
     ["Network", "Ranking", "Explain", "About / Method"]
 )
 with tab_network:
-     network_view.render(entities, exposures, st.session_state["result"])
+    network_view.render(entities, exposures, result)
 with tab_ranking:
-    ranking_view.render(entities, get_baseline(), st.session_state["result"])
+    ranking_view.render(entities, get_baseline(), result)
 with tab_explain:
-    explain_view.render(entities, get_baseline(), st.session_state["result"], explain_entity)
+    explain_view.render(entities, get_baseline(), result, explain_entity)
 with tab_about:
     about_view.render()
