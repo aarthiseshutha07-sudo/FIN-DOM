@@ -10,7 +10,8 @@ import streamlit as st
 # TEMPORARY: mock data. Replace these imports/functions when the real engine
 # structures are known. Nothing below this section touches mock_data directly.
 from app import mock_data
-from app import network_view, ranking_view
+from app import network_view, ranking_view, explain_view
+
 
 
 
@@ -30,6 +31,11 @@ def run_scenario(source_id, severity_pct):
     entities, exposures = get_data()
     return mock_data.mock_cascade(entities, exposures, source_id, severity_pct)
 
+def explain_entity(result, entity_id):
+    """Return the explanation dict for one institution."""
+    entities, _ = get_data()
+    return mock_data.mock_explain(result, entities, entity_id)
+
 
 def compute_kpis(result):
     """Turn a result into the four KPI values shown on the dashboard."""
@@ -40,6 +46,7 @@ def compute_kpis(result):
         "loss": result["total_loss"],
         "rounds": result["rounds"],
     }
+
 # ========================================================================
 
 st.set_page_config(
@@ -123,6 +130,6 @@ with tab_network:
 with tab_ranking:
     ranking_view.render(entities, get_baseline(), st.session_state["result"])
 with tab_explain:
-    st.write("Explanation panel goes here.")
+    explain_view.render(entities, get_baseline(), st.session_state["result"], explain_entity)
 with tab_about:
     st.write("Method and limitations go here.")
