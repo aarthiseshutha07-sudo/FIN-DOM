@@ -17,6 +17,7 @@ STRESS_HISTORY, EVENTS, SOURCE_ID, ROUNDS = "stress_history", "events", "source_
 STATUS_COLORS = {"Stable": "#2e9d5b", "Stressed": "#f5a524", "Failed": "#e5484d"}
 EDGE_COLOR = "rgba(140,140,140,0.30)"
 HIT_EDGE_COLOR = "rgba(229,72,77,0.85)"
+SOURCE_COLOR = "#7c5cff"  # halo + label color that marks the shocked institution
 
 
 def status_from_stress(stress):
@@ -68,22 +69,42 @@ def build_figure(entities, exposures, result=None, view_round=0):
             fig.add_trace(_edge_trace(hit, pos, HIT_EDGE_COLOR, 3, name="Loss path"))
 
     rows = entities.set_index(ID)
+
+    def hover_data(i, status):
+        return [rows.at[i, NAME], rows.at[i, TYPE], rows.at[i, REGION],
+                rows.at[i, ASSETS], stress[i], status]
+
+    hover = ("<b>%{customdata[0]}</b><br>%{customdata[1]} · %{customdata[2]}"
+             "<br>Assets: %{customdata[3]:,}M"
+             "<br>Stress: %{customdata[4]:.2f} (%{customdata[5]})<extra></extra>")
+
     for status, color in STATUS_COLORS.items():
-        members = [i for i in ids if status_from_stress(stress[i]) == status]
+        members = [i for i in ids if i != source and status_from_stress(stress[i]) == status]
         fig.add_trace(go.Scatter(
             x=[pos[i][0] for i in members], y=[pos[i][1] for i in members],
             mode="markers", name=status,
-            marker=dict(
-                color=color,
-                size=[14 + 22 * weight[i] / top for i in members],
-                symbol=["diamond" if i == source else "circle" for i in members],
-                line=dict(width=[3 if i == source else 1 for i in members], color="white"),
-            ),
-            customdata=[[rows.at[i, NAME], rows.at[i, TYPE], rows.at[i, REGION],
-                         rows.at[i, ASSETS], stress[i], status] for i in members],
-            hovertemplate=("<b>%{customdata[0]}</b><br>%{customdata[1]} · %{customdata[2]}"
-                           "<br>Assets: %{customdata[3]:,}M"
-                           "<br>Stress: %{customdata[4]:.2f} (%{customdata[5]})<extra></extra>"),
+            marker=dict(color=color, size=[14 + 22 * weight[i] / top for i in members],
+                        line=dict(width=1, color="white")),
+            customdata=[hover_data(i, status) for i in members], hovertemplate=hover,
+        ))
+
+    if source is not None:
+        x, y = pos[source]
+        size = 14 + 22 * weight[source] / top
+        status = status_from_stress(stress[source])
+        # Halo ring behind the node so the source stands out whatever its status color is.
+        fig.add_trace(go.Scatter(
+            x=[x], y=[y], mode="markers", name="Source (shocked)", hoverinfo="skip",
+            marker=dict(size=size + 26, color="rgba(124,92,255,0.25)",
+                        line=dict(width=3, color=SOURCE_COLOR)),
+        ))
+        fig.add_trace(go.Scatter(
+            x=[x], y=[y], mode="markers+text", showlegend=False,
+            text=[f"<b>SOURCE: {rows.at[source, NAME]}</b>"], textposition="top center",
+            textfont=dict(color=SOURCE_COLOR, size=13),
+            marker=dict(symbol="star", size=size + 8, color=STATUS_COLORS[status],
+                        line=dict(width=2, color="white")),
+            customdata=[hover_data(source, status)], hovertemplate=hover,
         ))
 
     fig.update_layout(
@@ -119,9 +140,7 @@ def render(entities, exposures, result):
         labels = [status_from_stress(v) for v in stress.values()]
         st.caption(f"Round {view_round} of {result[ROUNDS]}: "
                    f"{labels.count('Stressed')} stressed, {labels.count('Failed')} failed. "
-                   "Diamond = source. Node size = total exposure. Red lines = loss paths.")
+                   "Purple ring + star = source. Node size = total exposure. Red lines = loss paths.")
     else:
         st.caption("Run a scenario to see the contagion. Node size = total exposure. "
                    "Positions stay fixed between runs.")
-
-        
