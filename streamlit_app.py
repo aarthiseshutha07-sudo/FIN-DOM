@@ -10,7 +10,7 @@ import streamlit as st
 # TEMPORARY: mock data. Replace these imports/functions when the real engine
 # structures are known. Nothing below this section touches mock_data directly.
 from app import mock_data
-from app import network_view, ranking_view, explain_view
+from app import about_view ,network_view, ranking_view, explain_view
 
 
 
@@ -132,4 +132,4 @@ with tab_ranking:
 with tab_explain:
     explain_view.render(entities, get_baseline(), st.session_state["result"], explain_entity)
 with tab_about:
-    st.write("Method and limitations go here.")
+    about_view.render()
