@@ -39,6 +39,16 @@ def build_table(entities, baseline, result=None):
     return df[["Rank", "Institution", "Type", "Baseline", "Scenario", "Change", "Status"]]
 
 
+def to_csv_bytes(table, result=None):
+    """CSV for download: plain text only (no icons or star), plus an 'Is source' flag."""
+    out = table.copy()
+    is_source = out["Institution"].str.startswith("★ ")
+    out["Institution"] = out["Institution"].str.replace("★ ", "", regex=False)
+    if result is not None:
+        out["Status"] = out["Status"].str.split(" ", n=1).str[-1]
+        out["Is source"] = is_source
+    return out.to_csv(index=False).encode("utf-8")
+
 def render(entities, baseline, result):
     """Draw the Ranking tab content."""
     table = build_table(entities, baseline, result)
@@ -61,3 +71,8 @@ def render(entities, baseline, result):
 
         st.dataframe(table, hide_index=True, column_config=config,
                  height=min(35 * (len(table) + 1) + 3, 900), **layout.stretch(st.dataframe))
+        
+        name = "fin-dom_baseline.csv" if result is None else (
+            f"fin-dom_scenario_{result[SOURCE_ID]}_{result.get('severity', 0)}pct.csv")
+        st.download_button("⬇ Download as CSV", data=to_csv_bytes(table, result),
+                        file_name=name, mime="text/csv")
