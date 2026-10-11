@@ -1,4 +1,3 @@
-
 """Iterative financial contagion simulation for FIN-DOM."""
 
 from __future__ import annotations
@@ -110,6 +109,10 @@ def run_cascade(
     initial_losses = {entity_id: 0.0 for entity_id in ids}
     initial_losses[source_id] = initial_loss
 
+    # Stress two rounds back, used by the ledger. Before round 1 this is
+    # all zeros, because s(-1) = 0 for every institution.
+    earlier = {entity_id: 0.0 for entity_id in ids}
+
     # Propagate stress through the exposure network.
     for round_number in range(1, MAX_ROUNDS + 1):
         previous = stress.copy()
@@ -136,12 +139,14 @@ def run_cascade(
                 1.0, total_loss / buffers[entity_id]
             )
 
-        # Record incremental losses caused by stress increases this round.
+        # Record the NEW loss on each link this round. Following the rules,
+        # it uses the debtor's stress change BEFORE this round:
+        # s(t-1) - s(t-2).
         for _, exposure in exposures.iterrows():
             creditor_id = exposure["creditor_id"]
             debtor_id = exposure["debtor_id"]
             stress_increase = max(
-                0.0, next_stress[debtor_id] - previous[debtor_id]
+                0.0, previous[debtor_id] - earlier[debtor_id]
             )
 
             if stress_increase <= 0:
@@ -166,6 +171,7 @@ def run_cascade(
             )
 
         stress = next_stress
+        earlier = previous
         snapshots[round_number] = stress.copy()
 
         for entity_id in ids:
