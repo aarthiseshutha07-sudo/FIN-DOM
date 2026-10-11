@@ -1,0 +1,4 @@
+entity_id,name,type,region,total_assets_bn,capital_buffer_bn
+MER,Meridian Bank,Bank,Americas,300,63
+HAR,Harbor Bank,Bank,Europe,180,36
+NOR,Northwind Fund,Fund,Asia-Pacific,70,14

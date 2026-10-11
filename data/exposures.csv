@@ -1,0 +1,4 @@
+exposure_id,creditor_id,debtor_id,exposure_bn,exposure_type
+E1,HAR,MER,28,Interbank loan
+E2,NOR,MER,10,Bond holding
+E3,NOR,HAR,20,Credit line
