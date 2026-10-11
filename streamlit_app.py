@@ -13,11 +13,14 @@ layout.configure_page()  # must come before any other Streamlit output
 # ======================= DATA ACCESS (swap point) =======================
 # TEMPORARY: mock data. Replace these imports/functions when the real engine
 # structures are known. Nothing below this section touches mock_data directly.
+# ======================= DATA ACCESS (swap point) =======================
+# Real engine, via the adapter in app/engine_adapter.py.
+
 from app import engine_adapter
 
 @st.cache_data
 def get_data():
-    """Return (entities, exposures) from the real CSVs via the engine."""
+    """Return (entities, exposures) loaded from data/*.csv through the engine."""
     return engine_adapter.load_data()
 
 @st.cache_data
@@ -41,6 +44,8 @@ def compute_kpis(result):
         "loss": result["total_loss"],
         "rounds": result["rounds"],
     }
+
+# ========================================================================
 # ========================================================================
 
 entities, exposures = get_data()
