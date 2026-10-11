@@ -2,3 +2,12 @@ entity_id,name,type,region,total_assets_bn,capital_buffer_bn
 MER,Meridian Bank,Bank,Americas,300,63
 HAR,Harbor Bank,Bank,Europe,180,36
 NOR,Northwind Fund,Fund,Asia-Pacific,70,14
+ATL,Atlas Fund,Fund,Americas,90,18
+EVE,Evergreen Insurance,Insurer,Europe,150,30
+SUM,Summit Capital,Bank,Asia-Pacific,220,44
+PIN,Pinnacle Insurance,Insurer,Americas,120,24
+BEA,Beacon Bank,Bank,Europe,140,28
+TRI,Trident Fund,Fund,Europe,60,12
+OCE,Oceanic Holdings,Corporate,Asia-Pacific,80,20
+LAN,Landmark Industries,Corporate,Americas,100,25
+VAL,Republic of Valoria,Sovereign,Europe,500,150

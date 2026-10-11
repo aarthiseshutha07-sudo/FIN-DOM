@@ -2,3 +2,32 @@ exposure_id,creditor_id,debtor_id,exposure_bn,exposure_type
 E1,HAR,MER,28,Interbank loan
 E2,NOR,MER,10,Bond holding
 E3,NOR,HAR,20,Credit line
+E4,MER,HAR,25,Interbank loan
+E5,MER,SUM,30,Interbank loan
+E6,SUM,MER,22,Interbank loan
+E7,SUM,BEA,18,Interbank loan
+E8,BEA,HAR,20,Interbank loan
+E9,BEA,MER,15,Interbank loan
+E10,ATL,MER,12,Bond holding
+E11,ATL,SUM,10,Equity stake
+E12,EVE,HAR,25,Bond holding
+E13,EVE,MER,20,Bond holding
+E14,PIN,MER,18,Bond holding
+E15,PIN,ATL,20,Equity stake
+E16,PIN,EVE,10,Insurance claim
+E17,HAR,EVE,8,Insurance claim
+E18,TRI,BEA,10,Bond holding
+E19,TRI,NOR,6,Equity stake
+E20,SUM,OCE,15,Credit line
+E21,MER,LAN,20,Credit line
+E22,BEA,OCE,10,Credit line
+E23,HAR,LAN,12,Credit line
+E24,MER,VAL,40,Bond holding
+E25,HAR,VAL,30,Bond holding
+E26,EVE,VAL,35,Bond holding
+E27,BEA,VAL,20,Bond holding
+E28,MER,ATL,15,Derivative
+E29,SUM,NOR,12,Derivative
+E30,HAR,TRI,10,Derivative
+E31,EVE,PIN,12,Insurance claim
+E32,SUM,PIN,10,Derivative
