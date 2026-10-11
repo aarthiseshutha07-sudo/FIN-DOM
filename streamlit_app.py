@@ -13,31 +13,24 @@ layout.configure_page()  # must come before any other Streamlit output
 # ======================= DATA ACCESS (swap point) =======================
 # TEMPORARY: mock data. Replace these imports/functions when the real engine
 # structures are known. Nothing below this section touches mock_data directly.
-from app import mock_data
-
+from app import engine_adapter
 
 @st.cache_data
 def get_data():
-    """Return (entities, exposures). Cached so it loads once."""
-    return mock_data.mock_load_data()
-
+    """Return (entities, exposures) from the real CSVs via the engine."""
+    return engine_adapter.load_data()
 
 @st.cache_data
 def get_baseline():
-    entities, exposures = get_data()
-    return mock_data.mock_baseline(entities, exposures)
-
+    return engine_adapter.baseline()
 
 def run_scenario(source_id, severity_pct):
-    entities, exposures = get_data()
-    return mock_data.mock_cascade(entities, exposures, source_id, severity_pct)
-
+    return engine_adapter.run_scenario(source_id, severity_pct)
 
 def explain_entity(result, entity_id):
     """Return the explanation dict for one institution."""
     entities, _ = get_data()
-    return mock_data.mock_explain(result, entities, entity_id)
-
+    return engine_adapter.explain_entity(result, entities, entity_id)
 
 def compute_kpis(result):
     """Turn a result into the four KPI values shown on the dashboard."""
