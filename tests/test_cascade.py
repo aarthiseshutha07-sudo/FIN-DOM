@@ -209,3 +209,36 @@ def test_simulation_stops_when_stress_converges(sample_data):
 
             if last_round < MAX_ROUNDS:
                 assert converged
+
+
+def test_simulation_never_exceeds_max_rounds(sample_data):
+    from engine.params import MAX_ROUNDS
+
+    entities, exposures = sample_data
+
+    result = run_cascade(
+        entities,
+        exposures,
+        source_id="MER",
+        severity=0.7,
+    )
+
+    assert max(result["snapshots"]) <= MAX_ROUNDS
+
+
+def test_zero_severity_stops_after_convergence(sample_data):
+    entities, exposures = sample_data
+
+    result = run_cascade(
+        entities,
+        exposures,
+        source_id="MER",
+        severity=0.0,
+    )
+
+    # No initial shock means no institution should become stressed.
+    assert all(
+        value == 0.0
+        for snapshot in result["snapshots"].values()
+        for value in snapshot.values()
+    )
