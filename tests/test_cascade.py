@@ -89,3 +89,69 @@ def test_unknown_source_is_rejected(sample_data):
 
     with pytest.raises(ValueError):
         run_cascade(entities, exposures, "UNKNOWN", 0.7)
+
+
+def test_ledger_losses_are_non_negative(sample_data):
+    entities, exposures = sample_data
+
+    result = run_cascade(
+        entities,
+        exposures,
+        source_id="MER",
+        severity=0.7,
+    )
+
+    ledger = result["ledger"]
+
+    assert (ledger["loss_bn"] >= 0).all()
+    assert (ledger["stress_increase"] >= 0).all()
+
+
+def test_ledger_records_expected_initial_shock(sample_data):
+    entities, exposures = sample_data
+
+    result = run_cascade(
+        entities,
+        exposures,
+        source_id="MER",
+        severity=0.7,
+    )
+
+    ledger = result["ledger"]
+    shock = ledger[ledger["debtor_id"] == "SHOCK"]
+
+    assert len(shock) == 1
+    assert shock.iloc[0]["creditor_id"] == "MER"
+    assert shock.iloc[0]["loss_bn"] == pytest.approx(63.0)
+
+
+def test_final_losses_match_final_stress(sample_data):
+    entities, exposures = sample_data
+
+    result = run_cascade(
+        entities,
+        exposures,
+        source_id="MER",
+        severity=0.7,
+    )
+
+    state = result["state"].set_index("entity_id")
+
+    expected_losses = {
+        "MER": 63.0,
+        "HAR": 16.8,
+        "NOR": 11.6,
+    }
+
+    for entity_id, expected_loss in expected_losses.items():
+        actual_loss = (
+            float(state.loc[entity_id, "final_stress"])
+            * float(
+                entities.loc[
+                    entities["entity_id"] == entity_id,
+                    "capital_buffer_bn",
+                ].iloc[0]
+            )
+        )
+
+        assert actual_loss == pytest.approx(expected_loss, abs=0.02)
