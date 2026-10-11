@@ -155,3 +155,57 @@ def test_final_losses_match_final_stress(sample_data):
         )
 
         assert actual_loss == pytest.approx(expected_loss, abs=0.02)
+
+def test_simulation_stops_within_max_rounds(sample_data):
+    from engine.params import MAX_ROUNDS
+
+    entities, exposures = sample_data
+
+    result = run_cascade(
+        entities,
+        exposures,
+        source_id="MER",
+        severity=0.7,
+    )
+
+    propagation_rounds = [
+        round_number
+        for round_number in result["snapshots"]
+        if round_number > 0
+    ]
+
+    assert len(propagation_rounds) <= MAX_ROUNDS
+    assert max(propagation_rounds, default=0) <= MAX_ROUNDS
+
+
+def test_simulation_stops_when_stress_converges(sample_data):
+    entities, exposures = sample_data
+
+    result = run_cascade(
+        entities,
+        exposures,
+        source_id="MER",
+        severity=0.7,
+    )
+
+    snapshots = result["snapshots"]
+
+    if len(snapshots) >= 2:
+        last_round = max(snapshots)
+        previous_round = last_round - 1
+
+        if previous_round in snapshots:
+            last_stress = snapshots[last_round]
+            previous_stress = snapshots[previous_round]
+
+            converged = all(
+                abs(last_stress[entity_id] - previous_stress[entity_id])
+                <= 1e-6
+                for entity_id in last_stress
+            )
+
+            # If it stopped before MAX_ROUNDS, it should have converged.
+            from engine.params import MAX_ROUNDS
+
+            if last_round < MAX_ROUNDS:
+                assert converged
