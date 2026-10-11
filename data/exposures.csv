@@ -31,3 +31,44 @@ E29,SUM,NOR,12,Derivative
 E30,HAR,TRI,10,Derivative
 E31,EVE,PIN,12,Insurance claim
 E32,SUM,PIN,10,Derivative
+E33,NGB,TIT,12,Credit line
+E34,NGB,VER,24,Bond holding
+E35,FAL,NGB,4,Equity stake
+E36,CRE,BEA,12,Interbank loan
+E37,CRE,VAL,12,Bond holding
+E38,ORC,CRE,9,Equity stake
+E39,SOL,ORC,7,Derivative
+E40,SOL,VAL,9,Bond holding
+E41,PIN,SOL,6,Bond holding
+E42,SEN,CRE,5,Bond holding
+E43,SEN,VAL,10,Bond holding
+E44,VAN,SEN,4,Bond holding
+E45,LIG,MER,7,Bond holding
+E46,LIG,VAL,9,Bond holding
+E47,SUM,LIG,15,Insurance claim
+E48,GRA,OCE,6,Bond holding
+E49,GRA,VAL,9,Bond holding
+E50,PIN,GRA,5,Insurance claim
+E51,VAN,PIN,8,Bond holding
+E52,VAN,VER,7,Bond holding
+E53,SOL,VAN,9,Derivative
+E54,ORC,EVE,6,Bond holding
+E55,ORC,VER,9,Bond holding
+E56,MER,ORC,17,Derivative
+E57,FAL,LAN,4,Bond holding
+E58,FAL,VER,8,Bond holding
+E59,VAN,FAL,7,Bond holding
+E60,VAN,TIT,6,Bond holding
+E61,SUM,HEL,8,Credit line
+E62,MER,NIM,21,Credit line
+E63,SOL,VER,11,Bond holding
+E64,MER,LIG,15,Insurance claim
+E65,MER,GRA,11,Insurance claim
+E66,ATL,BEA,7,Equity stake
+E67,MER,NGB,18,Interbank loan
+E68,SUM,NGB,12,Interbank loan
+E69,SEN,NGB,10,Bond holding
+E70,HAR,TIT,12,Credit line
+E71,EVE,TIT,14,Bond holding
+E72,CRE,TIT,10,Credit line
+E74,GRA,VER,14,Bond holding
